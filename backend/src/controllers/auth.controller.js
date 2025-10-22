@@ -7,6 +7,22 @@ const login = (req, res) => {
 const register = async (req, res) => {
   const { fullName, email, password, phone, bio } = req.body;
   try {
+    const existPhone = await User.findOne({ phone });
+
+    if (existPhone) {
+      return res.status(400).json({
+        success: false,
+        message: "Phone is already registered",
+      });
+    }
+
+    const existUser = await User.findOne({ email });
+    if (existUser) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Email is already registered" });
+    }
+
     const user = await User.create({
       fullName,
       email,
@@ -14,6 +30,7 @@ const register = async (req, res) => {
       phone,
       bio,
     });
+
     return res
       .status(201)
       .json({ success: true, message: "User registered", data: user });
