@@ -29,8 +29,15 @@ router.post(
   validate,
   register
 );
-router.post("/login", login);
-router.get("/login", login);
+router.post(
+  "/login",
+  [
+    body("email").isEmail().withMessage("Valid email is required"),
+    body("password").notEmpty().withMessage("Password is required"),
+  ],
+  validate,
+  login
+);
 
 router.post("/logout", logout);
 

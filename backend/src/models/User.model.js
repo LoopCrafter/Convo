@@ -43,7 +43,6 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-const User = model("User", userSchema);
 //pre hook to hash password before saving
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
@@ -57,4 +56,12 @@ userSchema.pre("save", async function (next) {
     next(err);
   }
 });
+
+//method to compare password
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return bcrypt.compare(candidatePassword, this.password);
+};
+
+const User = model("User", userSchema);
+
 export default User;
