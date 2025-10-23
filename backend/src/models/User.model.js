@@ -56,6 +56,14 @@ userSchema.pre("save", async function (next) {
     next(err);
   }
 });
+userSchema.set("toJSON", {
+  virtuals: true,
+  versionKey: false,
+  transform: function (doc, ret) {
+    ret.id = ret._id;
+    delete ret._id;
+  },
+});
 
 //method to compare password
 userSchema.methods.comparePassword = async function (candidatePassword) {

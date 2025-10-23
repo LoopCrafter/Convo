@@ -1,6 +1,6 @@
 import User from "../models/User.model.js";
-
 import { generateAccessToken } from "../utils/index.js";
+
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -17,9 +17,11 @@ const login = async (req, res) => {
         .json({ success: false, message: "Invalid email or password" });
     }
     generateAccessToken(res, user._id);
-    return res
-      .status(200)
-      .json({ success: true, message: "Login successful", data: user });
+    return res.status(200).json({
+      success: true,
+      message: "Login successful",
+      data: { ...user.toJSON(), password: undefined },
+    });
   } catch (error) {
     return res
       .status(500)
@@ -60,7 +62,11 @@ const register = async (req, res) => {
 
     return res
       .status(201)
-      .json({ success: true, message: "User registered", data: user });
+      .json({
+        success: true,
+        message: "User registered",
+        data: { ...user.toJSON(), password: undefined },
+      });
   } catch (error) {
     return res
       .status(500)
