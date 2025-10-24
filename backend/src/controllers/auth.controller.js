@@ -1,3 +1,4 @@
+import { upsertStreamUser } from "../../lib/stream.js";
 import User from "../models/User.model.js";
 import { generateAccessToken } from "../utils/index.js";
 
@@ -59,14 +60,22 @@ const register = async (req, res) => {
       avatarUrl: randomAvatar,
     });
     generateAccessToken(res, user);
-
-    return res
-      .status(201)
-      .json({
-        success: true,
-        message: "User registered",
-        data: { ...user.toJSON(), password: undefined },
+    try {
+      await upsertStreamUser({
+        id: user._id.toString(),
+        name: user.fullName,
+        email: user.email,
+        image: user.avatarUrl,
       });
+      console.log("Stream user upserted successfully");
+    } catch (err) {
+      console.error("Error upserting Stream user:", err);
+    }
+    return res.status(201).json({
+      success: true,
+      message: "User registered",
+      data: { ...user.toJSON(), password: undefined },
+    });
   } catch (error) {
     return res
       .status(500)
@@ -74,8 +83,13 @@ const register = async (req, res) => {
   }
 };
 
-const logout = (req, res) => {
-  res.json({ message: "Logout route" });
-};
+function logout(req, res) {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
+  res.status(200).json({ success: true, message: "Logout successful" });
+}
 
 export { login, register, logout };
