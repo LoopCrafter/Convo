@@ -93,7 +93,7 @@ function logout(req, res) {
 }
 
 const onboarding = async (req, res) => {
-  const userId = req.userId;
+  const userId = req.user.id;
 
   console.log("Onboarding userId:", userId);
   try {

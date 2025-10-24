@@ -66,4 +66,11 @@ router.post(
   onboarding
 );
 
+router.get("/me", requireAuth, (req, res) => {
+  return res.status(200).json({
+    success: true,
+    message: "Authenticated",
+    user: req.user,
+  });
+});
 export default router;

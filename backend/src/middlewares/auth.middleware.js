@@ -37,7 +37,7 @@ const requireAuth = async (req, res, next) => {
         message: "User not found",
       });
     }
-    req.userId = decoded.userId;
+    req.user = user;
 
     next();
   } catch (err) {
