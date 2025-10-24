@@ -92,4 +92,7 @@ function logout(req, res) {
   res.status(200).json({ success: true, message: "Logout successful" });
 }
 
-export { login, register, logout };
+const onboarding = async (req, res) => {
+  res.status(200).json({ success: true, message: "Onboarding successful" });
+};
+export { login, register, logout, onboarding };
