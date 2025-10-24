@@ -29,6 +29,7 @@ const requireAuth = async (req, res, next) => {
       });
     }
 
+    console.log("req.cookies.token", decoded);
     const user = await User.findById(decoded.userId).select("-password");
     if (!user) {
       return res.status(401).json({
@@ -40,6 +41,7 @@ const requireAuth = async (req, res, next) => {
 
     next();
   } catch (err) {
+    console.log("Authentication error:", err);
     // distinguish error types
     if (err.name === "TokenExpiredError") {
       return res.status(401).json({

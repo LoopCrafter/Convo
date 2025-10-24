@@ -59,7 +59,7 @@ const register = async (req, res) => {
       bio,
       avatarUrl: randomAvatar,
     });
-    generateAccessToken(res, user);
+    generateAccessToken(res, user._id);
     try {
       await upsertStreamUser({
         id: user._id.toString(),
@@ -93,6 +93,50 @@ function logout(req, res) {
 }
 
 const onboarding = async (req, res) => {
+  const userId = req.userId;
+
+  console.log("Onboarding userId:", userId);
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        ...req.body,
+        isOnboarded: true,
+      },
+      { new: true }
+    );
+    if (!updatedUser) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    try {
+      await upsertStreamUser({
+        id: updatedUser.id.toString(),
+        name: updatedUser.fullName,
+        image: updatedUser.avatarUrl || "",
+      });
+      console.log(
+        `Stream user updated after onboarding for ${updatedUser.fullName}`
+      );
+    } catch (streamError) {
+      console.log(
+        "Error updating Stream user during onboarding:",
+        streamError.message
+      );
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Onboarding successful",
+      user: { ...updatedUser.toJSON(), password: undefined },
+    });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ success: false, message: err.message || "Server error" });
+  }
   res.status(200).json({ success: true, message: "Onboarding successful" });
 };
 export { login, register, logout, onboarding };

@@ -46,6 +46,24 @@ router.post(
 );
 
 router.post("/logout", logout);
-router.post("/onboarding", requireAuth, onboarding);
+router.post(
+  "/onboarding",
+  requireAuth,
+  [
+    body("fullName").notEmpty().withMessage("Full name is required"),
+    body("bio").notEmpty().withMessage("Bio is required"),
+    body("avatarUrl").isURL().withMessage("Valid avatar URL is required"),
+    body("phone").notEmpty().withMessage("Phone number is required"),
+    body("location").notEmpty().withMessage("Location is required"),
+    body("nativeLanguage")
+      .notEmpty()
+      .withMessage("Native language is required"),
+    body("learningLanguage")
+      .notEmpty()
+      .withMessage("Learning language is required"),
+  ],
+  validate,
+  onboarding
+);
 
 export default router;
