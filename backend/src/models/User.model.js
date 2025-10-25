@@ -21,12 +21,6 @@ const userSchema = new Schema(
       type: String,
       default: "",
     },
-    friends: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
   },
   { timestamps: true }
 );
