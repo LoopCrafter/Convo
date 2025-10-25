@@ -1,3 +1,4 @@
+import cloudinary from "../../lib/cloudinary.js";
 import { upsertStreamUser } from "../../lib/stream.js";
 import User from "../models/User.model.js";
 import { generateAccessToken } from "../utils/index.js";
