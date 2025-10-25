@@ -30,7 +30,7 @@ const login = async (req, res) => {
   }
 };
 
-const register = async (req, res) => {
+const signup = async (req, res) => {
   const { fullName, email, password, phone, bio } = req.body;
   try {
     const existPhone = await User.findOne({ phone });
@@ -139,4 +139,37 @@ const onboarding = async (req, res) => {
   }
   res.status(200).json({ success: true, message: "Onboarding successful" });
 };
-export { login, register, logout, onboarding };
+
+const checkAuth = (req, res) => {
+  try {
+    res.status(200).json(req.user);
+  } catch (error) {
+    console.log("Error in checkAuth controller", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const updateProfile = async (req, res) => {
+  try {
+    const { profilePic } = req.body;
+    const userId = req.user._id;
+
+    if (!profilePic) {
+      return res.status(400).json({ message: "Profile pic is required" });
+    }
+
+    const uploadResponse = await cloudinary.uploader.upload(profilePic);
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { profilePic: uploadResponse.secure_url },
+      { new: true }
+    );
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.log("error in update profile:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export { login, signup, logout, onboarding, checkAuth, updateProfile };

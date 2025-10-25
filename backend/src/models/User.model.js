@@ -17,33 +17,9 @@ const userSchema = new Schema(
       required: true,
       minlength: 8,
     },
-    phone: {
-      type: String,
-      required: true,
-    },
-    bio: {
+    profilePic: {
       type: String,
       default: "",
-    },
-    avatarUrl: {
-      type: String,
-      default: "",
-    },
-    nativeLanguage: {
-      type: String,
-      default: "",
-    },
-    learningLanguage: {
-      type: String,
-      default: "",
-    },
-    location: {
-      type: String,
-      default: "",
-    },
-    isOnboarded: {
-      type: Boolean,
-      default: false,
     },
     friends: [
       {

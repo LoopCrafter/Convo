@@ -1,18 +1,20 @@
 import { Router } from "express";
 import {
+  checkAuth,
   login,
   logout,
   onboarding,
-  register,
+  signup,
+  updateProfile,
 } from "../controllers/auth.controller.js";
 import { body } from "express-validator";
 import { validate } from "../middlewares/validate.middleware.js";
-import { requireAuth } from "../middlewares/auth.middleware.js";
+import { protectRoute } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
 router.post(
-  "/register",
+  "/signup",
   [
     body("fullName").notEmpty().withMessage("Full name is required"),
     body("email").isEmail().withMessage("Valid email is required"),
@@ -33,7 +35,7 @@ router.post(
     body("phone").notEmpty().withMessage("Phone number is required"),
   ],
   validate,
-  register
+  signup
 );
 router.post(
   "/login",
@@ -48,7 +50,7 @@ router.post(
 router.post("/logout", logout);
 router.post(
   "/onboarding",
-  requireAuth,
+  protectRoute,
   [
     body("fullName").notEmpty().withMessage("Full name is required"),
     body("bio").notEmpty().withMessage("Bio is required"),
@@ -66,11 +68,7 @@ router.post(
   onboarding
 );
 
-router.get("/me", requireAuth, (req, res) => {
-  return res.status(200).json({
-    success: true,
-    message: "Authenticated",
-    user: req.user,
-  });
-});
+router.put("/update-profile", protectRoute, updateProfile);
+router.get("/check", protectRoute, checkAuth);
+
 export default router;

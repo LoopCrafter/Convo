@@ -1,65 +1,33 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.model.js";
 
-const requireAuth = async (req, res, next) => {
-  let token;
-
-  if (req.cookies && req.cookies.token) {
-    token = req.cookies.token;
-  } else {
-    return res.status(401).json({
-      success: false,
-      message: "No token provided, unauthorized",
-    });
-  }
-
-  if (!token) {
-    return res.status(401).json({
-      success: false,
-      message: "Invalid token format",
-    });
-  }
-
+export const protectRoute = async (req, res, next) => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    if (!decoded) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid token",
-      });
+    const token = req.cookies.jwt;
+
+    if (!token) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized - No Token Provided" });
     }
 
-    console.log("req.cookies.token", decoded);
-    const user = await User.findById(decoded.userId).select("-password");
-    if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: "User not found",
-      });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (!decoded) {
+      return res.status(401).json({ message: "Unauthorized - Invalid Token" });
     }
+
+    const user = await User.findById(decoded.userId).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     req.user = user;
 
     next();
-  } catch (err) {
-    console.log("Authentication error:", err);
-    // distinguish error types
-    if (err.name === "TokenExpiredError") {
-      return res.status(401).json({
-        success: false,
-        message: "Token expired - please refresh",
-      });
-    } else if (err.name === "JsonWebTokenError") {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid token signature",
-      });
-    } else {
-      return res.status(500).json({
-        success: false,
-        message: err.message || "Server error in authentication",
-      });
-    }
+  } catch (error) {
+    console.log("Error in protectRoute middleware: ", error.message);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
-
-export { requireAuth };
