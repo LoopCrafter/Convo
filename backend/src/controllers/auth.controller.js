@@ -1,5 +1,4 @@
 import cloudinary from "../../lib/cloudinary.js";
-import { upsertStreamUser } from "../../lib/stream.js";
 import User from "../models/User.model.js";
 import { generateAccessToken } from "../utils/index.js";
 
@@ -58,20 +57,9 @@ const signup = async (req, res) => {
       password,
       phone,
       bio,
-      avatarUrl: randomAvatar,
+      profilePic: randomAvatar,
     });
     generateAccessToken(res, user._id);
-    try {
-      await upsertStreamUser({
-        id: user._id.toString(),
-        name: user.fullName,
-        email: user.email,
-        image: user.avatarUrl,
-      });
-      console.log("Stream user upserted successfully");
-    } catch (err) {
-      console.error("Error upserting Stream user:", err);
-    }
     return res.status(201).json({
       success: true,
       message: "User registered",
@@ -110,22 +98,6 @@ const onboarding = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "User not found" });
-    }
-
-    try {
-      await upsertStreamUser({
-        id: updatedUser.id.toString(),
-        name: updatedUser.fullName,
-        image: updatedUser.avatarUrl || "",
-      });
-      console.log(
-        `Stream user updated after onboarding for ${updatedUser.fullName}`
-      );
-    } catch (streamError) {
-      console.log(
-        "Error updating Stream user during onboarding:",
-        streamError.message
-      );
     }
 
     res.status(200).json({
