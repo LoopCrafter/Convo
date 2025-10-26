@@ -5,6 +5,6 @@ import messageRoutes from "./message.routes.js";
 const router = Router();
 
 router.use("/auth", authRoutes);
-router.use("/message", messageRoutes);
+router.use("/messages", messageRoutes);
 
 export default router;
