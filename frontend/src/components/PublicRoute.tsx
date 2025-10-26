@@ -7,7 +7,7 @@ interface PublicRouteProps {
 
 export const PublicRoute = ({ children }: PublicRouteProps) => {
   const { user } = useAuthStore();
-
+  console.log("user", user);
   if (user) {
     return <Navigate to="/" replace />;
   }

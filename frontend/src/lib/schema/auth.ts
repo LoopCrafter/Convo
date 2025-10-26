@@ -33,3 +33,15 @@ export const SignupSchema = z
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
+
+export const LoginSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .min(1, { message: "Please Enter Your Email" })
+    .email({ message: "Email is invalid!" }),
+
+  password: z.string().min(8, "Password must be at least 8 characters long"),
+});
+
+export type LoginType = z.infer<typeof LoginSchema>;

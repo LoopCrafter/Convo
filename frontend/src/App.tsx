@@ -13,12 +13,11 @@ import { PublicRoute } from "./components/PublicRoute";
 import { Toaster } from "react-hot-toast";
 
 const App = () => {
-  const { user, checkAuth, isCheckingAuth } = useAuthStore();
+  const { checkAuth, isCheckingAuth } = useAuthStore();
 
   useEffect(() => {
     checkAuth();
   }, []);
-
   if (isCheckingAuth) {
     return (
       <div className="flex h-screen justify-center items-center">

@@ -1,7 +1,48 @@
 "use server";
 
 import { api } from "../axios";
-import { SignupSchema } from "../schema/auth";
+import { LoginSchema, SignupSchema } from "../schema/auth";
+
+const loginAction = async (prev: any, formData: FormData) => {
+  const loginData = {
+    email: formData.get("email") || "",
+    password: formData.get("password") || "",
+  };
+
+  const result = LoginSchema.safeParse(loginData);
+  if (!result.success) {
+    const errors: Record<string, string> = {};
+
+    result.error.issues.forEach((issue) => {
+      const field = issue.path[0];
+      if (!errors[field as string]) {
+        errors[field as string] = issue.message;
+      }
+    });
+    return {
+      success: false,
+      errors,
+      data: loginData,
+    };
+  }
+  try {
+    const res = await api.post("/auth/login", loginData);
+    console.log("res", res.data);
+    return {
+      success: true,
+      data: loginData,
+      userData: res.data.data,
+      errors: { email: "", password: "" },
+    };
+  } catch (error: any) {
+    console.log("errors", error);
+    return {
+      success: false,
+      data: loginData,
+      apiError: error.message || "Please try again later",
+    };
+  }
+};
 
 const signupAction = async (prev: any, formData: FormData) => {
   const signupData = {
@@ -28,7 +69,6 @@ const signupAction = async (prev: any, formData: FormData) => {
   }
   try {
     const res = await api.post("/auth/signup", signupData);
-    console.log(res.data.data);
     return {
       success: true,
       message: "Signup successful",
@@ -48,4 +88,4 @@ const signupAction = async (prev: any, formData: FormData) => {
   }
 };
 
-export { signupAction };
+export { signupAction, loginAction };

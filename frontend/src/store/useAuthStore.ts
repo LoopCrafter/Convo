@@ -1,16 +1,13 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
 import type { User } from "../types";
 import { api } from "../lib/axios";
 
 interface AuthState {
   user: User | null;
   isCheckingAuth: boolean;
-  isSigningUp: boolean;
-  isLoggingIn: boolean;
-  isProfileUpdating: boolean;
-  checkAuth: () => Promise<void>;
   setUser: (user: User) => void;
+  checkAuth: () => Promise<void>;
   logout: () => void;
 }
 
@@ -18,29 +15,35 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
-      isCheckingAuth: true,
-      isSigningUp: false,
-      isLoggingIn: false,
-      isProfileUpdating: false,
+      isCheckingAuth: false,
+
+      setUser: (user: User) => {
+        console.log("setUser called with:", user); // اینو اضافه کن – ببین undefinedه؟
+        if (user) {
+          console.log("Setting valid user:", user.id || user.fullName); // جزئیات user
+        } else {
+          console.log("WARNING: setUser called with undefined/null!");
+        }
+        set({ user });
+      },
+
+      logout: () => set({ user: null }),
 
       checkAuth: async () => {
+        set({ isCheckingAuth: true });
         try {
           const res = await api.get("/auth/check");
-          set({ user: res.data.user });
-        } catch (err) {
+          set({ user: res.data });
+        } catch {
           set({ user: null });
         } finally {
           set({ isCheckingAuth: false });
         }
       },
-
-      setUser: (user: User) => set({ user }),
-
-      logout: () => set({ user: null }),
     }),
     {
       name: "auth-storage",
-      partialize: (state) => ({ user: state.user }),
+      storage: createJSONStorage(() => localStorage),
     }
   )
 );
