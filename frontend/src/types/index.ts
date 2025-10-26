@@ -3,6 +3,7 @@ type User = {
   email: string;
   profilePic?: string;
   id: string;
+  createdAt: string;
 };
 
 export type { User };
