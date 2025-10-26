@@ -17,17 +17,16 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isCheckingAuth: false,
 
-      setUser: (user: User) => {
-        console.log("setUser called with:", user); // اینو اضافه کن – ببین undefinedه؟
-        if (user) {
-          console.log("Setting valid user:", user.id || user.fullName); // جزئیات user
-        } else {
-          console.log("WARNING: setUser called with undefined/null!");
-        }
-        set({ user });
-      },
+      setUser: (user: User) => set({ user }),
 
-      logout: () => set({ user: null }),
+      logout: async () => {
+        try {
+          await api.post("/auth/logout");
+          set({ user: null });
+        } catch (error) {
+        } finally {
+        }
+      },
 
       checkAuth: async () => {
         set({ isCheckingAuth: true });

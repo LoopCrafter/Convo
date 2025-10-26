@@ -11,7 +11,7 @@ import AuthImagePattern from "../components/AuthImagePattern";
 import { useActionState, useEffect, useState } from "react";
 import { signupAction } from "../lib/actions/auth";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import type { User as UserType } from "../types";
 import { useAuthStore } from "../store/useAuthStore";
 
@@ -218,6 +218,14 @@ const SignupPage = () => {
               )}
             </button>
           </form>
+          <div className="text-center">
+            <p className="text-base-content/60">
+              Already have an account?{" "}
+              <Link to="/login" className="link link-primary">
+                Sign in
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
       {/* right side */}
