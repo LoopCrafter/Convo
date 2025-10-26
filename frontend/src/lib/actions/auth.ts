@@ -27,11 +27,13 @@ const signupAction = async (prev: any, formData: FormData) => {
     };
   }
   try {
-    const res = await api.post("/auth/signup", { body: signupData });
+    const res = await api.post("/auth/signup", signupData);
+    console.log(res.data.data);
     return {
       success: true,
       message: "Signup successful",
       data: signupData,
+      userData: res.data.data,
       errors: { fullName: "", email: "", password: "", confirmPassword: "" },
     };
   } catch (error: any) {
@@ -40,12 +42,7 @@ const signupAction = async (prev: any, formData: FormData) => {
       success: false,
       message: "",
       data: signupData,
-      errors: error.errors || {
-        fullName: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-      },
+
       apiError: error.message || "Please try again later",
     };
   }

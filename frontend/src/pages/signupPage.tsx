@@ -8,8 +8,12 @@ import {
   User,
 } from "lucide-react";
 import AuthImagePattern from "../components/AuthImagePattern";
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { signupAction } from "../lib/actions/auth";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import type { User as UserType } from "../types";
+import { useAuthStore } from "../store/useAuthStore";
 
 type InitialStateType = {
   success: boolean;
@@ -26,6 +30,7 @@ type InitialStateType = {
     password: string;
     confirmPassword: string;
   };
+  userData?: UserType;
 };
 const initialState: InitialStateType = {
   success: false,
@@ -42,11 +47,26 @@ const initialState: InitialStateType = {
     password: "",
     confirmPassword: "",
   },
+  userData: undefined,
 };
 const SignupPage = () => {
+  const navigate = useNavigate();
+  const { setUser } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [state, action, isPending] = useActionState(signupAction, initialState);
+  useEffect(() => {
+    console.log(state);
+    if (state.apiError) {
+      toast.error(state.apiError);
+    }
+    if (state.success) {
+      setUser(state.userData);
+      toast.success("You Registered Successfully");
+      navigate("/", { replace: true });
+    }
+  }, [state]);
+
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
       {/* left side */}

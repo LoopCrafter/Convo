@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import { Loader } from "lucide-react";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { PublicRoute } from "./components/PublicRoute";
+import { Toaster } from "react-hot-toast";
 
 const App = () => {
   const { user, checkAuth, isCheckingAuth } = useAuthStore();
@@ -64,6 +65,7 @@ const App = () => {
           }
         />
       </Routes>
+      <Toaster position="top-right" />
     </div>
   );
 };

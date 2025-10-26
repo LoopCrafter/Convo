@@ -33,15 +33,6 @@ const login = async (req, res) => {
 const signup = async (req, res) => {
   const { fullName, email, password, phone, bio } = req.body;
   try {
-    const existPhone = await User.findOne({ phone });
-
-    if (existPhone) {
-      return res.status(400).json({
-        success: false,
-        message: "Phone is already registered",
-      });
-    }
-
     const existUser = await User.findOne({ email });
     if (existUser) {
       return res
