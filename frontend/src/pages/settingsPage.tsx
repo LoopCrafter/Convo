@@ -35,8 +35,8 @@ const SettingsPage = () => {
               onClick={() => setTheme(t)}
             >
               <div
-                className="relative h-8 w-full rounded-md overflow-hidden"
                 data-theme={t}
+                className="relative h-8 w-full rounded-md overflow-hidden isolate"
               >
                 <div className="absolute inset-0 grid grid-cols-4 gap-px p-1">
                   <div className="rounded bg-primary"></div>
@@ -45,6 +45,7 @@ const SettingsPage = () => {
                   <div className="rounded bg-neutral"></div>
                 </div>
               </div>
+
               <span className="text-[11px] font-medium truncate w-full text-center">
                 {t.charAt(0).toUpperCase() + t.slice(1)}
               </span>
