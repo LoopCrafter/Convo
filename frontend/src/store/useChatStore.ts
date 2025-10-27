@@ -11,7 +11,11 @@ type ChatStoreTypes = {
   isMessagesLoading: boolean;
   getUsers: () => Promise<void>;
   getMessages: (userId: string) => Promise<void>;
-  setSelectedUser: (selectedUser: User) => void;
+  setSelectedUser: (selectedUser: User | null) => void;
+  sendMessage: (messageData: {
+    text?: string | null;
+    image?: File | string | null;
+  }) => void;
 };
 
 export const useChatStore = create<ChatStoreTypes>((set, get) => ({
@@ -39,7 +43,7 @@ export const useChatStore = create<ChatStoreTypes>((set, get) => ({
     set({ isMessagesLoading: true });
     try {
       const res = await api.get(`/messages/${userId}`);
-      set({ messages: res.data });
+      set({ messages: res.data.messages });
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
@@ -50,5 +54,24 @@ export const useChatStore = create<ChatStoreTypes>((set, get) => ({
       set({ isMessagesLoading: false });
     }
   },
-  setSelectedUser: (selectedUser: User) => set({ selectedUser }),
+  sendMessage: async (messageData: {
+    text?: string | null;
+    image?: File | string | null;
+  }) => {
+    const { selectedUser, messages } = get();
+    try {
+      const res = await api.post(
+        `/messages/send/${selectedUser?.id}`,
+        messageData
+      );
+      set({ messages: [...messages, res.data] });
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("There is an error, please Try Again Later!");
+      }
+    }
+  },
+  setSelectedUser: (selectedUser: User | null) => set({ selectedUser }),
 }));
