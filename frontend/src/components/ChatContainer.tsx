@@ -23,7 +23,7 @@ const ChatContainer = () => {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
-
+  console.log("hamed", { user, messages });
   return (
     <div className="flex-1 flex flex-col overflow-auto">
       <ChatHeader />
@@ -35,7 +35,7 @@ const ChatContainer = () => {
             <div
               key={message._id}
               className={`chat ${
-                message.senderId === user?.id ? "chat-end" : "chat-start"
+                message.sender === user?.id ? "chat-end" : "chat-start"
               }`}
               ref={messageEndRef}
             >
@@ -43,7 +43,7 @@ const ChatContainer = () => {
                 <div className="size-10 rounded-full border">
                   <img
                     src={
-                      message.senderId === user?.id
+                      message.sender === user?.id
                         ? user?.profilePic || "/avatar.png"
                         : selectedUser?.profilePic || "/avatar.png"
                     }
