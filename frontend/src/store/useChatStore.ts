@@ -64,7 +64,8 @@ export const useChatStore = create<ChatStoreTypes>((set, get) => ({
         `/messages/send/${selectedUser?.id}`,
         messageData
       );
-      set({ messages: [...messages, res.data] });
+      console.log("HAMED", res);
+      set({ messages: [...messages, res.data.message] });
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
