@@ -3,7 +3,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import type { User } from "../types";
 import { api } from "../lib/axios";
 import toast from "react-hot-toast";
-
+import { io } from "socket.io-client";
 interface UpdateProfileData {
   profilePic?: string;
   fullName?: string;
@@ -18,22 +18,29 @@ interface AuthState {
   checkAuth: () => Promise<void>;
   logout: () => void;
   updateProfile: (data: UpdateProfileData) => Promise<void>;
+  connectSocket: () => void;
+  disconnectSocket: () => void;
+  socket: {
+    connected: any;
+    disconnect: any;
+  } | null;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       isCheckingAuth: false,
       isUpdatingProfile: false,
 
       setUser: (user: User) => set({ user }),
-
+      socket: null,
       logout: async () => {
         try {
           await api.post("/auth/logout");
           set({ user: null });
           toast.success("Logged out successfully");
+          get().disconnectSocket();
         } catch (error) {
         } finally {
         }
@@ -44,6 +51,7 @@ export const useAuthStore = create<AuthState>()(
         try {
           const res = await api.get("/auth/check");
           set({ user: res.data });
+          get().connectSocket();
         } catch {
           set({ user: null });
         } finally {
@@ -68,10 +76,28 @@ export const useAuthStore = create<AuthState>()(
           set({ isUpdatingProfile: false });
         }
       },
+      connectSocket: () => {
+        const { user } = get();
+        if (!user || get().socket?.connected) return;
+        const socket = io(import.meta.env.VITE_BACKEND_BASE_URL, {
+          query: {
+            userId: user.id,
+          },
+        });
+        console.log("SOCKET CONNECTIOB CALLED");
+        socket.connect();
+        set({ socket: socket });
+      },
+      disconnectSocket: () => {
+        if (get().socket?.connected) get().socket?.disconnect();
+      },
     }),
     {
       name: "auth-storage",
       storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        user: state.user,
+      }),
     }
   )
 );

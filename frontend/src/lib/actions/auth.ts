@@ -1,5 +1,6 @@
 "use server";
 
+import { useAuthStore } from "../../store/useAuthStore";
 import { api } from "../axios";
 import { LoginSchema, SignupSchema } from "../schema/auth";
 
@@ -27,11 +28,14 @@ const loginAction = async (prev: any, formData: FormData) => {
   }
   try {
     const res = await api.post("/auth/login", loginData);
-    console.log("res", res.data);
+    const userData = res.data.data;
+    const { setUser, connectSocket } = useAuthStore.getState();
+    setUser(userData);
+    connectSocket();
     return {
       success: true,
       data: loginData,
-      userData: res.data.data,
+      userData: userData,
       errors: { email: "", password: "" },
     };
   } catch (error: any) {
@@ -69,6 +73,10 @@ const signupAction = async (prev: any, formData: FormData) => {
   }
   try {
     const res = await api.post("/auth/signup", signupData);
+    const userData = res.data.data;
+    const { setUser, connectSocket } = useAuthStore.getState();
+    setUser(userData);
+    connectSocket();
     return {
       success: true,
       message: "Signup successful",

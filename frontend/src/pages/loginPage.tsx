@@ -25,7 +25,6 @@ const LoginPage = () => {
     }
     if (state.success) {
       toast.success("Successfully Loggedin");
-      setUser({ ...state.userData });
       navigate("/", { replace: true });
     }
   }, [state]);

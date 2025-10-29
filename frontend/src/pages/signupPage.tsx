@@ -61,7 +61,6 @@ const SignupPage = () => {
       toast.error(state.apiError);
     }
     if (state.success) {
-      setUser(state.userData);
       toast.success("You Registered Successfully");
       navigate("/", { replace: true });
     }
