@@ -12,6 +12,10 @@ const io = new Server(server, {
   },
 });
 const onlineUsers = new Map();
+
+export const getReceiverId = (userId) => {
+  return onlineUsers.get(userId);
+};
 io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId;
   if (userId) {
