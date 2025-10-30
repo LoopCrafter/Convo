@@ -11,12 +11,19 @@ const io = new Server(server, {
     credentials: true,
   },
 });
-
+const onlineUsers = new Map();
 io.on("connection", (socket) => {
-  console.log("A User Connected", socket.id);
+  const userId = socket.handshake.query.userId;
+  if (userId) {
+    onlineUsers.set(userId, socket.id);
+  }
+  io.emit("online-users", Array.from(onlineUsers.keys()));
 
   socket.on("disconnect", () => {
-    console.log("A user Disconnected", socket.id);
+    if (userId) {
+      onlineUsers.delete(userId);
+    }
+    io.emit("online-users", Array.from(onlineUsers.keys()));
   });
 });
 export { app, server, io };
