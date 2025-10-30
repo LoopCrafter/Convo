@@ -3,7 +3,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import type { User } from "../types";
 import { api } from "../lib/axios";
 import toast from "react-hot-toast";
-import { io } from "socket.io-client";
+import { Socket, io } from "socket.io-client";
 interface UpdateProfileData {
   profilePic?: string;
   fullName?: string;
@@ -21,11 +21,7 @@ interface AuthState {
   updateProfile: (data: UpdateProfileData) => Promise<void>;
   connectSocket: () => void;
   disconnectSocket: () => void;
-  socket: {
-    connected: any;
-    disconnect: any;
-    removeAllListeners: any;
-  } | null;
+  socket: Socket | null;
 }
 
 export const useAuthStore = create<AuthState>()(

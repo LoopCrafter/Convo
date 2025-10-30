@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { api } from "../lib/axios";
 import toast from "react-hot-toast";
 import type { User } from "../types";
+import { useAuthStore } from "./useAuthStore";
 
 type ChatStoreTypes = {
   messages: any[];
@@ -12,6 +13,8 @@ type ChatStoreTypes = {
   getUsers: () => Promise<void>;
   getMessages: (userId: string) => Promise<void>;
   setSelectedUser: (selectedUser: User | null) => void;
+  subscribeToMessage: () => void;
+  unsubscribeFromMessages: () => void;
   sendMessage: (messageData: {
     text?: string | null;
     image?: File | string | null;
@@ -72,6 +75,25 @@ export const useChatStore = create<ChatStoreTypes>((set, get) => ({
       } else {
         toast.error("There is an error, please Try Again Later!");
       }
+    }
+  },
+  subscribeToMessage: () => {
+    const { selectedUser } = get();
+    if (!selectedUser) return;
+    const socket = useAuthStore.getState().socket;
+    if (socket) {
+      socket.on("newMessage", (newMessage) => {
+        const isMessageSentFromSelectedUser =
+          newMessage.senderId === selectedUser?.id;
+        if (!isMessageSentFromSelectedUser) return;
+        set({ messages: [...get().messages, newMessage] });
+      });
+    }
+  },
+  unsubscribeFromMessages: () => {
+    const socket = useAuthStore.getState().socket;
+    if (socket) {
+      socket.off("newMessage");
     }
   },
   setSelectedUser: (selectedUser: User | null) => set({ selectedUser }),
