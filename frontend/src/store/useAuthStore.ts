@@ -14,6 +14,7 @@ interface AuthState {
   user: User | null;
   isCheckingAuth: boolean;
   isUpdatingProfile: boolean;
+  onlineUsers: string[];
   setUser: (user: User) => void;
   checkAuth: () => Promise<void>;
   logout: () => void;
@@ -23,6 +24,7 @@ interface AuthState {
   socket: {
     connected: any;
     disconnect: any;
+    removeAllListeners: any;
   } | null;
 }
 
@@ -32,7 +34,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isCheckingAuth: false,
       isUpdatingProfile: false,
-
+      onlineUsers: [],
       setUser: (user: User) => set({ user }),
       socket: null,
       logout: async () => {
@@ -77,17 +79,43 @@ export const useAuthStore = create<AuthState>()(
         }
       },
       connectSocket: () => {
-        const { user } = get();
-        if (!user || get().socket?.connected) return;
-        const socket = io(import.meta.env.VITE_BACKEND_BASE_URL, {
-          query: {
-            userId: user.id,
-          },
+        const { user, socket } = get();
+        if (!user) return;
+
+        // 1️⃣ قطع اتصال و پاک کردن listenerهای قبلی
+        if (socket) {
+          socket.removeAllListeners();
+          socket.disconnect();
+        }
+
+        // 2️⃣ ساخت socket جدید
+        const newSocket = io(import.meta.env.VITE_BACKEND_BASE_URL, {
+          query: { userId: user.id },
+          autoConnect: true,
         });
-        console.log("SOCKET CONNECTIOB CALLED");
-        socket.connect();
-        set({ socket: socket });
+
+        // 3️⃣ listenerها
+        newSocket.on("connect", () => {
+          console.log("✅ Connected:", newSocket.id);
+        });
+
+        newSocket.on("online-users", (userIds: string[]) => {
+          set({ onlineUsers: userIds });
+          console.log("🔄 Online Users Updated:", userIds);
+        });
+
+        newSocket.on("disconnect", (reason: string) => {
+          console.log("❌ Socket disconnected:", reason);
+        });
+
+        newSocket.on("connect_error", (err: any) => {
+          console.error("⚠️ Socket connection error:", err);
+        });
+
+        // 4️⃣ ذخیره socket جدید در Zustand
+        set({ socket: newSocket });
       },
+
       disconnectSocket: () => {
         if (get().socket?.connected) get().socket?.disconnect();
       },
