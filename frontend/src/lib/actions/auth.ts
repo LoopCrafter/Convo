@@ -4,7 +4,7 @@ import { useAuthStore } from "../../store/useAuthStore";
 import { api } from "../axios";
 import { LoginSchema, SignupSchema } from "../schema/auth";
 
-const loginAction = async (prev: any, formData: FormData) => {
+const loginAction = async (_: any, formData: FormData) => {
   const loginData = {
     email: formData.get("email") || "",
     password: formData.get("password") || "",
@@ -48,7 +48,7 @@ const loginAction = async (prev: any, formData: FormData) => {
   }
 };
 
-const signupAction = async (prev: any, formData: FormData) => {
+const signupAction = async (_: any, formData: FormData) => {
   const signupData = {
     fullName: formData.get("fullName") ?? "",
     email: formData.get("email") ?? "",

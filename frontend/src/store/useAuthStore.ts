@@ -4,6 +4,10 @@ import type { User } from "../types";
 import { api } from "../lib/axios";
 import toast from "react-hot-toast";
 import { Socket, io } from "socket.io-client";
+
+const BASE_URL =
+  import.meta.env.MODE === "development" ? "http://localhost:5001" : "/";
+
 interface UpdateProfileData {
   profilePic?: string;
   fullName?: string;
@@ -75,41 +79,20 @@ export const useAuthStore = create<AuthState>()(
         }
       },
       connectSocket: () => {
-        const { user, socket } = get();
-        if (!user) return;
+        const { user } = get();
+        if (!user || get().socket?.connected) return;
 
-        // 1️⃣ قطع اتصال و پاک کردن listenerهای قبلی
-        if (socket) {
-          socket.removeAllListeners();
-          socket.disconnect();
-        }
-
-        // 2️⃣ ساخت socket جدید
-        const newSocket = io(import.meta.env.VITE_BACKEND_BASE_URL, {
-          query: { userId: user.id },
-          autoConnect: true,
+        const socket = io(BASE_URL, {
+          query: {
+            userId: user.id,
+          },
         });
-
-        // 3️⃣ listenerها
-        newSocket.on("connect", () => {
-          console.log("✅ Connected:", newSocket.id);
-        });
-
-        newSocket.on("online-users", (userIds: string[]) => {
+        socket.connect();
+        socket.on("online-users", (userIds: string[]) => {
           set({ onlineUsers: userIds });
-          console.log("🔄 Online Users Updated:", userIds);
         });
 
-        newSocket.on("disconnect", (reason: string) => {
-          console.log("❌ Socket disconnected:", reason);
-        });
-
-        newSocket.on("connect_error", (err: any) => {
-          console.error("⚠️ Socket connection error:", err);
-        });
-
-        // 4️⃣ ذخیره socket جدید در Zustand
-        set({ socket: newSocket });
+        set({ socket: socket });
       },
 
       disconnectSocket: () => {

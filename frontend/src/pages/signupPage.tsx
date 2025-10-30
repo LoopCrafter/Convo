@@ -13,7 +13,6 @@ import { signupAction } from "../lib/actions/auth";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import type { User as UserType } from "../types";
-import { useAuthStore } from "../store/useAuthStore";
 
 type InitialStateType = {
   success: boolean;
@@ -51,7 +50,6 @@ const initialState: InitialStateType = {
 };
 const SignupPage = () => {
   const navigate = useNavigate();
-  const { setUser } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [state, action, isPending] = useActionState(signupAction, initialState);

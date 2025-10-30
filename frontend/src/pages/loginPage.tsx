@@ -2,7 +2,6 @@ import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare } from "lucide-react";
 import AuthImagePattern from "../components/AuthImagePattern";
 import { Link, useNavigate } from "react-router-dom";
 import { useActionState, useEffect, useState } from "react";
-import { useAuthStore } from "../store/useAuthStore";
 import { loginAction } from "../lib/actions/auth";
 import toast from "react-hot-toast";
 
@@ -18,7 +17,6 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const [state, action, isPending] = useActionState(loginAction, initialState);
   const [showPassword, setShowPassword] = useState(false);
-  const { setUser } = useAuthStore();
   useEffect(() => {
     if (state.apiError) {
       toast.error(state.apiError);
