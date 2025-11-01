@@ -9,12 +9,15 @@ type ChatStoreTypes = {
   users: User[];
   selectedUser: User | null;
   isUsersLoading: boolean;
+  isTyping: boolean;
   isMessagesLoading: boolean;
   getUsers: () => Promise<void>;
   getMessages: (userId: string) => Promise<void>;
   setSelectedUser: (selectedUser: User | null) => void;
   subscribeToMessage: () => void;
+  subscribeToTyping: () => void;
   unsubscribeFromMessages: () => void;
+  unsubscribeFromTyping: () => void;
   sendMessage: (messageData: {
     text?: string | null;
     image?: File | string | null;
@@ -27,6 +30,7 @@ export const useChatStore = create<ChatStoreTypes>((set, get) => ({
   selectedUser: null,
   isUsersLoading: false,
   isMessagesLoading: false,
+  isTyping: false,
   getUsers: async () => {
     set({ isUsersLoading: true });
     try {
@@ -96,4 +100,23 @@ export const useChatStore = create<ChatStoreTypes>((set, get) => ({
     }
   },
   setSelectedUser: (selectedUser: User | null) => set({ selectedUser }),
+  subscribeToTyping: () => {
+    const { selectedUser } = get();
+    if (!selectedUser) return;
+    const socket = useAuthStore.getState().socket;
+    if (socket) {
+      socket.on("typing", ({ senderId, isTyping }) => {
+        if (senderId !== selectedUser.id) return;
+        set({ isTyping: isTyping });
+      });
+    }
+  },
+
+  unsubscribeFromTyping: () => {
+    const socket = useAuthStore.getState().socket;
+    if (socket) {
+      socket.off("typing");
+      set({ isTyping: false });
+    }
+  },
 }));

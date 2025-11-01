@@ -1,7 +1,14 @@
-import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
 import { useChatStore } from "../store/useChatStore";
 import { Image, Send, X } from "lucide-react";
 import toast from "react-hot-toast";
+import { useAuthStore } from "../store/useAuthStore";
 
 interface SendMessagePayload {
   text: string;
@@ -12,7 +19,9 @@ const MessageInput: React.FC = () => {
   const [text, setText] = useState<string>("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const { sendMessage } = useChatStore();
+  const { sendMessage, selectedUser, isTyping } = useChatStore();
+  const { socket, user } = useAuthStore();
+  const typingTimeout = useRef<any | null>(null);
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -55,8 +64,40 @@ const MessageInput: React.FC = () => {
     }
   };
 
+  const handleChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setText(value);
+    const receiverId = selectedUser?.id;
+    const senderId = user?.id;
+    if (!value) {
+      socket?.emit("typing", {
+        receiverId,
+        isTyping: false,
+        senderId,
+      });
+      if (typingTimeout.current) clearTimeout(typingTimeout.current);
+      return;
+    }
+    socket?.emit("typing", { receiverId, isTyping: true, senderId });
+
+    if (typingTimeout.current) clearTimeout(typingTimeout.current);
+    typingTimeout.current = setTimeout(() => {
+      socket?.emit("typing", {
+        receiverId,
+        isTyping: false,
+        senderId,
+      });
+    }, 500);
+  };
+
   return (
-    <div className="p-4 w-full">
+    <div className="p-4 w-full relative">
+      {isTyping ? (
+        <span className="text-sm italic opacity-55 text-white absolute -top-3.5 left-5">
+          {" "}
+          {selectedUser?.fullName} is typing...
+        </span>
+      ) : null}
       {imagePreview && (
         <div className="mb-3 flex items-center gap-2">
           <div className="relative">
@@ -84,7 +125,7 @@ const MessageInput: React.FC = () => {
             className="w-full input input-bordered rounded-lg input-sm sm:input-md"
             placeholder="Type a message..."
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={handleChangeInput}
           />
           <input
             type="file"

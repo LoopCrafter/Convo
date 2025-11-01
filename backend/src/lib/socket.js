@@ -23,6 +23,22 @@ io.on("connection", (socket) => {
   }
   io.emit("online-users", Array.from(onlineUsers.keys()));
 
+  socket.on("typing", ({ receiverId, isTyping, senderId }) => {
+    const receiverSocketId = getReceiverId(receiverId);
+    if (receiverSocketId) {
+      console.log({
+        isTyping,
+        senderId,
+        receiverId,
+      });
+      io.to(receiverSocketId).emit("typing", {
+        isTyping,
+        senderId,
+        receiverId,
+      });
+    }
+  });
+
   socket.on("disconnect", () => {
     if (userId) {
       onlineUsers.delete(userId);
