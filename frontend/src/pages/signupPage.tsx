@@ -54,7 +54,6 @@ const SignupPage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [state, action, isPending] = useActionState(signupAction, initialState);
   useEffect(() => {
-    console.log(state);
     if (state.apiError) {
       toast.error(state.apiError);
     }

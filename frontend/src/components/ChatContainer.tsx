@@ -42,7 +42,7 @@ const ChatContainer = () => {
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.map((message) => (
             <div
-              key={message._id}
+              key={message.id}
               className={`chat ${
                 message.sender === user?.id ? "chat-end" : "chat-start"
               }`}

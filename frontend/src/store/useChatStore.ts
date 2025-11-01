@@ -67,7 +67,6 @@ export const useChatStore = create<ChatStoreTypes>((set, get) => ({
         `/messages/send/${selectedUser?.id}`,
         messageData
       );
-      console.log("HAMED", res);
       set({ messages: [...messages, res.data.message] });
     } catch (error) {
       if (error instanceof Error) {
@@ -84,7 +83,7 @@ export const useChatStore = create<ChatStoreTypes>((set, get) => ({
     if (socket) {
       socket.on("newMessage", (newMessage) => {
         const isMessageSentFromSelectedUser =
-          newMessage.senderId === selectedUser?.id;
+          newMessage.sender === selectedUser?.id;
         if (!isMessageSentFromSelectedUser) return;
         set({ messages: [...get().messages, newMessage] });
       });
