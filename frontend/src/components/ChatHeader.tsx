@@ -3,8 +3,9 @@ import { useChatStore } from "../store/useChatStore";
 
 type ChatHeaderProps = {
   onShowProfile: () => void;
+  onClose: () => void;
 };
-const ChatHeader: React.FC<ChatHeaderProps> = ({ onShowProfile }) => {
+const ChatHeader: React.FC<ChatHeaderProps> = ({ onShowProfile, onClose }) => {
   const { selectedUser, setSelectedUser } = useChatStore();
 
   return (
@@ -32,7 +33,13 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ onShowProfile }) => {
         </div>
 
         {/* Close button */}
-        <button onClick={() => setSelectedUser(null)}>
+        <button
+          className="cursor-pointer"
+          onClick={() => {
+            setSelectedUser(null);
+            onClose();
+          }}
+        >
           <X />
         </button>
       </div>

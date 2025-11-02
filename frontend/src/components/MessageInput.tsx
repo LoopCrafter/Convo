@@ -157,7 +157,7 @@ const MessageInput: React.FC = () => {
       )}
 
       <form onSubmit={handleSendMessage} className="flex items-center gap-2">
-        <div className="flex-1 flex gap-2 items-center">
+        <div className="flex-1 flex sm:gap-2 items-center">
           <div className="flex-1 flex sm:relative">
             <EmojiPicker
               onClose={() => setShowEmojiBox(false)}
@@ -191,7 +191,7 @@ const MessageInput: React.FC = () => {
 
           <button
             type="button"
-            className={`hidden sm:flex btn btn-circle
+            className={`flex btn btn-circle
                      ${imagePreview ? "text-emerald-500" : "text-zinc-400"}`}
             onClick={() => fileInputRef.current?.click()}
           >

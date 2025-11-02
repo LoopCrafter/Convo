@@ -8,7 +8,10 @@ import MessageInput from "./MessageInput";
 import { ChatInfoSidebar } from "./ChatInfoSidebar";
 import { NoMessages } from "./NoMessages";
 
-const ChatContainer = () => {
+type ChatContainerProps = {
+  onClose: () => void;
+};
+const ChatContainer: React.FC<ChatContainerProps> = ({ onClose }) => {
   const {
     selectedUser,
     getMessages,
@@ -44,12 +47,15 @@ const ChatContainer = () => {
   }, [messages]);
 
   return (
-    <div className="flex-1 flex flex-col overflow-auto relative overflow-x-hidden chat-container">
+    <div className="flex-1 flex flex-col overflow-auto relative overflow-x-hidden chat-container w-full">
       <ChatInfoSidebar
         isOpen={openSidebar}
         onClose={() => setOpenSidebar(false)}
       />
-      <ChatHeader onShowProfile={() => setOpenSidebar(true)} />
+      <ChatHeader
+        onShowProfile={() => setOpenSidebar(true)}
+        onClose={onClose}
+      />
       {isMessagesLoading ? (
         <MessageSkeleton />
       ) : (

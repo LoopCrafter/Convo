@@ -25,7 +25,7 @@ export const ChatInfoSidebar: React.FC<ChatInfoSidebarProps> = ({
           />
 
           <motion.div
-            className="absolute top-0 right-0 h-full w-[320px] bg-[#1c1d1f] text-white z-[60] shadow-xl border-l border-gray-700 flex flex-col"
+            className="absolute top-0 right-0 h-full w-full sm:w-[320px] bg-base-200 text-white z-[60] shadow-xl border-l border-gray-700 flex flex-col"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
