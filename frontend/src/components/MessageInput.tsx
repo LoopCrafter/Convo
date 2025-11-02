@@ -93,9 +93,15 @@ const MessageInput: React.FC = () => {
   return (
     <div className="p-4 w-full relative">
       {isTyping ? (
-        <span className="text-sm italic opacity-55 text-white absolute -top-3.5 left-5">
-          {" "}
-          {selectedUser?.fullName} is typing...
+        <span className="text-xs italic opacity-55 text-white absolute -top-3.5 left-5 flex items-center justify-start">
+          <span>
+            <span className="text-[11px]">{user?.fullName} </span>is typing
+          </span>
+          <span className="flex space-x-1 pt-2 scale-75">
+            <span className="w-1 h-1 bg-white rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+            <span className="w-1 h-1 bg-white rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+            <span className="w-1 h-1 bg-white rounded-full animate-bounce"></span>
+          </span>
         </span>
       ) : null}
       {imagePreview && (
