@@ -9,7 +9,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ onShowProfile }) => {
 
   return (
     <div
-      className="p-2.5 border-b border-base-300 cursor-pointer"
+      className="p-2.5 border-b border-base-300 cursor-pointer bg-base-100"
       onClick={onShowProfile}
     >
       <div className="flex items-center justify-between">

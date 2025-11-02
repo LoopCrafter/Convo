@@ -6,9 +6,10 @@ import {
   type FormEvent,
 } from "react";
 import { useChatStore } from "../store/useChatStore";
-import { Image, Send, X } from "lucide-react";
+import { Image, Send, SmilePlus, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuthStore } from "../store/useAuthStore";
+import { EmojiPicker } from "./EmojiPicker";
 
 interface SendMessagePayload {
   text: string;
@@ -16,12 +17,43 @@ interface SendMessagePayload {
 }
 
 const MessageInput: React.FC = () => {
-  const [text, setText] = useState<string>("");
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { sendMessage, selectedUser, isTyping } = useChatStore();
   const { socket, user } = useAuthStore();
   const typingTimeout = useRef<any | null>(null);
+  const [showEmojiBox, setShowEmojiBox] = useState(false);
+  const [text, setText] = useState<string>("");
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const textInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleEmojiSelect = (emoji: string) => {
+    setText((prev) => {
+      const newText = prev + emoji;
+      setTimeout(() => {
+        textInputRef.current?.focus();
+        textInputRef.current?.setSelectionRange(newText.length, newText.length);
+      }, 0);
+      return newText;
+    });
+    setShowEmojiBox(false);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        textInputRef.current &&
+        !textInputRef.current.contains(event.target as Node) &&
+        !(event.target as Element)?.closest?.(".emoji-picker")
+      ) {
+        setShowEmojiBox(false);
+      }
+    };
+
+    if (showEmojiBox) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showEmojiBox]);
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -125,14 +157,30 @@ const MessageInput: React.FC = () => {
       )}
 
       <form onSubmit={handleSendMessage} className="flex items-center gap-2">
-        <div className="flex-1 flex gap-2">
-          <input
-            type="text"
-            className="w-full input input-bordered rounded-lg input-sm sm:input-md"
-            placeholder="Type a message..."
-            value={text}
-            onChange={handleChangeInput}
-          />
+        <div className="flex-1 flex gap-2 items-center">
+          <div className="flex-1 flex sm:relative">
+            <EmojiPicker
+              onClose={() => setShowEmojiBox(false)}
+              onEmojiSelect={handleEmojiSelect}
+              show={showEmojiBox}
+            />
+
+            <input
+              ref={textInputRef}
+              type="text"
+              className="w-full input input-bordered rounded-lg input-sm sm:input-md sm:pl-10"
+              placeholder="Type a message..."
+              value={text}
+              onChange={handleChangeInput}
+            />
+            <button
+              type="button"
+              className="p-2 rounded-full hover:bg-gray-700 transition sm:absolute left-0.5 top-0.5 z-6 cursor-pointer opacity-50 hover:opacity-90"
+              onClick={() => setShowEmojiBox((prev) => !prev)}
+            >
+              <SmilePlus className="size-5 hover:bg-transparent" />
+            </button>
+          </div>
           <input
             type="file"
             accept="image/*"

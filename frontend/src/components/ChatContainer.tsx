@@ -3,7 +3,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import { useChatStore } from "../store/useChatStore";
 import ChatHeader from "./ChatHeader";
 import MessageSkeleton from "./skeletons/MessageSkeleton";
-import { formatMessageTime } from "../lib/utils";
+import { formatMessageTime, isSingleEmoji } from "../lib/utils";
 import MessageInput from "./MessageInput";
 import { ChatInfoSidebar } from "./ChatInfoSidebar";
 import { NoMessages } from "./NoMessages";
@@ -44,7 +44,7 @@ const ChatContainer = () => {
   }, [messages]);
 
   return (
-    <div className="flex-1 flex flex-col overflow-auto relative overflow-x-hidden">
+    <div className="flex-1 flex flex-col overflow-auto relative overflow-x-hidden chat-container">
       <ChatInfoSidebar
         isOpen={openSidebar}
         onClose={() => setOpenSidebar(false)}
@@ -88,7 +88,13 @@ const ChatContainer = () => {
                       className="sm:max-w-[200px] rounded-md mb-2"
                     />
                   )}
-                  {message.text && <p>{message.text}</p>}
+                  {isSingleEmoji(message.text) ? (
+                    <span className="text-3xl md:text-5xl leading-none block">
+                      {message.text}
+                    </span>
+                  ) : (
+                    message.text && <p>{message.text}</p>
+                  )}
                 </div>
               </div>
             ))

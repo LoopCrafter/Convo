@@ -1,2 +1,9 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+.chat-container {
+  background: url("/images/pattern.png");
+  background-repeat: repeat;
+  background-position: top right;
+  background-size: 510px auto;
+}
