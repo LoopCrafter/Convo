@@ -1,11 +1,17 @@
 import { X } from "lucide-react";
 import { useChatStore } from "../store/useChatStore";
 
-const ChatHeader = () => {
+type ChatHeaderProps = {
+  onShowProfile: () => void;
+};
+const ChatHeader: React.FC<ChatHeaderProps> = ({ onShowProfile }) => {
   const { selectedUser, setSelectedUser } = useChatStore();
 
   return (
-    <div className="p-2.5 border-b border-base-300">
+    <div
+      className="p-2.5 border-b border-base-300 cursor-pointer"
+      onClick={onShowProfile}
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           {/* Avatar */}
